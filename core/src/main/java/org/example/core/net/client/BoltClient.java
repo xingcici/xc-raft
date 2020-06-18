@@ -1,10 +1,13 @@
 package org.example.core.net.client;
 
+import com.alipay.remoting.CommonCommandCode;
 import com.alipay.remoting.ConnectionEventType;
 import com.alipay.remoting.rpc.RpcClient;
+import com.alipay.remoting.rpc.protocol.RpcProtocol;
 import org.example.common.life.LifeCycle;
 import org.example.core.net.processor.event.ConnectProcessor;
 import org.example.core.net.processor.event.DisconnectProcessor;
+import org.example.core.net.processor.event.HeartBeatProcessor;
 import org.example.core.net.processor.user.sync.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +37,7 @@ public class BoltClient implements LifeCycle {
             ConnectProcessor clientConnectProcessor = new ConnectProcessor("client");
             DisconnectProcessor clientDisconnectProcessor = new DisconnectProcessor("client");
             SyncClientUserProcessor syncClientUserProcessor = new SyncClientUserProcessor();
-
+            HeartBeatProcessor heartBeatProcessor = new HeartBeatProcessor("client");
             rpcClient = new RpcClient();
             rpcClient.addConnectionEventProcessor(ConnectionEventType.CONNECT, clientConnectProcessor);
             rpcClient.addConnectionEventProcessor(ConnectionEventType.CLOSE, clientDisconnectProcessor);
@@ -58,5 +61,9 @@ public class BoltClient implements LifeCycle {
         if (null != rpcClient) {
             rpcClient.shutdown();
         }
+    }
+
+    public RpcClient getRpcClient() {
+        return rpcClient;
     }
 }

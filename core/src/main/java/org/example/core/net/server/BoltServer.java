@@ -1,10 +1,15 @@
 package org.example.core.net.server;
 
+import com.alipay.remoting.CommandCode;
+import com.alipay.remoting.CommonCommandCode;
 import com.alipay.remoting.ConnectionEventType;
 import com.alipay.remoting.rpc.RpcServer;
+import com.alipay.remoting.rpc.protocol.RpcProtocol;
+import com.alipay.remoting.rpc.protocol.RpcProtocolV2;
 import org.example.common.life.LifeCycle;
 import org.example.core.net.processor.event.ConnectProcessor;
 import org.example.core.net.processor.event.DisconnectProcessor;
+import org.example.core.net.processor.event.HeartBeatProcessor;
 import org.example.core.net.processor.user.sync.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,12 +38,14 @@ public class BoltServer implements LifeCycle {
         ConnectProcessor serverConnectProcessor = new ConnectProcessor("server");
         DisconnectProcessor serverDisconnectProcessor = new DisconnectProcessor("server");
         SyncServerUserProcessor syncServerUserProcessor = new SyncServerUserProcessor();
-
+        HeartBeatProcessor heartBeatProcessor = new HeartBeatProcessor("server");
         rpcServer = new RpcServer(port, true);
-        rpcServer.startup();
+
         rpcServer.addConnectionEventProcessor(ConnectionEventType.CONNECT, serverConnectProcessor);
         rpcServer.addConnectionEventProcessor(ConnectionEventType.CLOSE, serverDisconnectProcessor);
         rpcServer.registerUserProcessor(syncServerUserProcessor);
+        rpcServer.startup();
+        rpcServer.registerProcessor(RpcProtocol.PROTOCOL_CODE, CommonCommandCode.HEARTBEAT, heartBeatProcessor);
     }
 
     @Override

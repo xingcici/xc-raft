@@ -1,5 +1,6 @@
 package org.example;
 
+import org.example.common.net.request.RequestBody;
 import org.example.core.net.client.BoltClient;
 import org.example.core.net.server.BoltServer;
 import org.slf4j.Logger;
@@ -33,8 +34,17 @@ public class RaftApplication {
             @Override
             public void run() {
                 boltClient.shutdown();
-                boltServer.shutdown();
+                //boltServer.shutdown();
             }
         }));
+        while (true) {
+            try{
+                boltClient.getRpcClient().invokeSync(address, new RequestBody("1", "hello", "".getBytes()), 3000);
+
+                Thread.sleep(3000);
+            }catch (Exception e) {
+
+            }
+        }
     }
 }
